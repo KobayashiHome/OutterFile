@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.linfa.outterfile.MainActivity">
+
+    <EditText
+        android:id="@+id/ed_Note"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="输入存储内容"
+        android:lines="3"/>
+
+    <Button
+        android:id="@+id/bt_Save"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="文件外部存储"/>
+    <Button
+        android:id="@+id/bt_Read"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="文件外部读取"/>
+    <TextView
+        android:id="@+id/tv_Read"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="读取内容"
+        android:lines="3"/>
+
+</LinearLayout>
