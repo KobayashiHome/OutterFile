@@ -2,16 +2,23 @@ package com.example.linfa.outterfile;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.os.Environment;
 import android.os.PatternMatcher;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * @date 2018/4/3
@@ -34,9 +41,6 @@ public class MainActivity extends AppCompatActivity {
         initViews();
 
         checkFilePermission();
-
-        String content = mNote.getText().toString().trim();
-        saveToFile("sky","skylinelin",content);
     }
 
     /**
@@ -44,8 +48,47 @@ public class MainActivity extends AppCompatActivity {
      */
     private boolean saveToFile(String dirName, String fileName, String content) {
 
+       if (!checkEnvironment()){
+           //如果检查失败
+           return false;
+       }
+        //获取存储根目录
+       String exter = Environment.getExternalStorageDirectory().getAbsolutePath();
+       File dir = new File(exter + "/" + dirName + "/");
+       if (!dir.exists()){
+           //如果文件夹不存在,就创建一下
+           dir.mkdir();
+       }
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(new File(dir,fileName));
+            fos.write(content.getBytes());
+            return true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fos != null){
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         return false;
 
+    }
+
+    /**
+     * 检查是否挂起
+     */
+    private boolean checkEnvironment() {
+        //挂载没有成功
+        return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
     }
 
     /**
@@ -65,6 +108,20 @@ public class MainActivity extends AppCompatActivity {
         mRead = findViewById(R.id.bt_Read);
         mSave = findViewById(R.id.bt_Save);
         mTvRead = findViewById(R.id.tv_Read);
+
+        mSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String content = mNote.getText().toString().trim();
+                boolean succ = saveToFile("sky", "skylinelin", content);
+
+                if (succ){
+                    Toast.makeText(MainActivity.this,"保存成功",Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(MainActivity.this,"保存失败",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @Override
