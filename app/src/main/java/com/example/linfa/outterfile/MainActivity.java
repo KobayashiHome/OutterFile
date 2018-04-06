@@ -2,23 +2,24 @@ package com.example.linfa.outterfile;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.os.Environment;
-import android.os.PatternMatcher;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  * @date 2018/4/3
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean saveToFile(String dirName, String fileName, String content) {
 
        if (!checkEnvironment()){
-           //如果检查失败
+           //如果sd卡检查失败
            return false;
        }
         //获取存储根目录
@@ -113,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String content = mNote.getText().toString().trim();
-                boolean succ = saveToFile("sky", "skylinelin", content);
+                boolean succ = saveToFile("sky", "skylinelin.txt", content);
 
                 if (succ){
                     Toast.makeText(MainActivity.this,"保存成功",Toast.LENGTH_SHORT).show();
@@ -122,6 +123,65 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        mRead.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String content = readFile("sky", "skylinelin.txt");
+                mTvRead.setText(content);
+            }
+        });
+    }
+
+    /**
+     * 问价读取
+     */
+    private String readFile(String dirName,String fileName) {
+
+        if (!checkEnvironment()){
+            return null;
+        }
+
+        //获取存储根目录
+        String exter = Environment.getExternalStorageDirectory().getAbsolutePath();
+        File dir = new File(exter + "/" + dirName + "/");
+        if (!dir.exists()){
+            //如果文件夹不存在,就创建一下
+            return null;
+        }
+
+        FileInputStream fls = null;
+        BufferedReader reader = null;
+
+        try {
+            fls = new FileInputStream(new File(dir,fileName));
+            reader = new BufferedReader(new InputStreamReader(fls));
+
+            StringBuilder builder = new StringBuilder();
+            String line;
+            if ((line = reader.readLine()) != null){
+                builder.append(line);
+            }
+            return builder.toString();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            try {
+                if (fls != null){
+                    fls.close();
+                }
+                if (reader !=null){
+                    reader.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        return null;
     }
 
     @Override
